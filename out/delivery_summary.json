@@ -1,0 +1,91 @@
+{
+ "sim_time_s": 124.8,
+ "distance_m": 84.0,
+ "delivered": true,
+ "events": [
+  [
+   74.1,
+   "DRIVE",
+   "XWALK_WAIT"
+  ],
+  [
+   80.0,
+   "XWALK_WAIT",
+   "XWALK_CROSS"
+  ],
+  [
+   92.4,
+   "XWALK_CROSS",
+   "DRIVE"
+  ],
+  [
+   101.5,
+   "DRIVE",
+   "APPROACH"
+  ],
+  [
+   103.8,
+   "APPROACH",
+   "ALIGN"
+  ],
+  [
+   110.2,
+   "ALIGN",
+   "PARK"
+  ],
+  [
+   110.4,
+   "PARK",
+   "OPEN"
+  ],
+  [
+   112.9,
+   "OPEN",
+   "HANDOFF"
+  ],
+  [
+   118.0,
+   "HANDOFF",
+   "CLOSE"
+  ],
+  [
+   120.8,
+   "CLOSE",
+   "DONE"
+  ]
+ ],
+ "mean_speed_moving_mps": 0.84,
+ "max_pod_tilt_deg": 4.74,
+ "p99_pod_tilt_deg": 2.89,
+ "max_soup_tilt_deg": 19.55,
+ "p99_soup_tilt_deg": 5.47,
+ "hop_events": 7,
+ "peak_vertical_g": 5.78,
+ "max_lean_deg": 11.41,
+ "loc_err_mean_m": 0.19,
+ "loc_err_max_m": 0.54,
+ "gnss_err_mean_m": 0.99,
+ "vision_fixes": 392,
+ "energy_Wh": 0.96,
+ "avg_power_W": 27.8,
+ "energy_split_Wh": {
+  "drive": 0.19,
+  "steer": 0.03,
+  "level": 0.0,
+  "hotel": 0.73
+ },
+ "runtime_est_h_at_this_duty": 13.2,
+ "wh_per_km": 11.5,
+ "robot_contacts_with_people_or_cars": 0,
+ "min_clearance_m": {
+  "ped_a": 0.34,
+  "ped_b": 0.36,
+  "ped_g1": 0.74,
+  "ped_g2": 1.02,
+  "ped_c": 1.02,
+  "car_n": 5.11,
+  "car_s": 1.73,
+  "ped_cust": 0.41
+ },
+ "peak_drive_torque_Nm": 18.4
+}

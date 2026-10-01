@@ -1,0 +1,27 @@
+part,category,qty,unit_usd,total_usd,notes
+Translucent 650 mm hemispheres (cut into rolling band + 2 side caps),shell,2,60,120,"Prototype: off-the-shelf PE/PC dome pair. Production: rotomould (one-off tooling, amortised)"
+TPU tread band overlay (cast/printed),shell,1,35,35,Grip + some shock absorption on the contact band
+Internal ring-gear segments + roller track,shell,1,40,40,Printed nylon/POM bonded inside the band edges
+V-groove rollers on 608 bearings,shell,24,1.25,30,Band rides on the stationary caps (no through-axle)
+Hatch hinge + latch servo + gasket,shell,1,30,30,Flush load-bearing door in the band
+Aluminium frame + stub axles + fasteners,structure,1,90,90,Laser-cut plate + extrusion
+BLDC drive motors with pinions (63xx class),drive,2,55,110,Drive pendulum -> ring gear (~20:1)
+FOC motor drivers,drive,2,60,120,
+Battery-swing steering actuator (12 Nm geared BLDC + encoder),drive,1,70,70,Must slew >=5 rad/s (sim requirement)
+Pod leveling motor (small geared DC + encoder),drive,1,25,25,<0.5 Nm needed in sim
+Park legs (4) + linkage + servo,park,1,60,60,Out of the stationary caps
+Spring-applied power-off brake,park,1,25,25,
+Battery 36 V 10S3P 21700 (432 Wh) + BMS + pack build,power,1,160,160,~12.8 h continuous driving
+Charging contacts + DC-DC converters,power,1,35,35,
+Compute: Jetson Orin Nano class module/kit,compute,1,249,249,Perception + planning; Pi 5 + NPU is a cheaper alternative
+Global-shutter fisheye cameras,sensing,4,35,140,2 per cap (front + rear)
+GNSS module,sensing,1,25,25,Metre-level is enough (vision corrects to ~0.2 m)
+IMU,sensing,1,15,15,
+Near-field ToF sensors,sensing,3,10,30,Cameras can't see the first ~0.45 m
+LTE modem + antenna,comms,1,45,45,
+Insulated EPP food pod + removable PP liner + gasket,food,1,45,45,~19 L
+Electronic pod lock + temperature sensor,food,1,20,20,Unlocks for the recipient's code only
+Eye LED panel + glow LED strips,looks,1,35,35,Eyes render through the translucent band
+Speaker + mic,looks,1,15,15,
+Flush E-stop + kill relay,safety,1,20,20,
+Wiring / connectors / prints / misc,misc,1,60,60,
