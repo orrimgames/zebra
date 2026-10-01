@@ -12,6 +12,7 @@ ROAD_Z = -0.12
 SW_Z = 0.004
 PLAZA_Z = 0.304
 SW_W = 2.4          # sidewalk width
+RAMP_Y0, RAMP_Y1 = 23.3, 24.7   # 1.4 m wide ADA curb ramps at the crosswalk
 
 
 @dataclass
@@ -26,6 +27,7 @@ class Agent:
     color: tuple = (0.3, 0.3, 0.6)
     idle_yaw: float = 0.0
     loop: bool = False
+    scale: float = 1.0           # people: 1.0 adult, ~0.65 child
 
     def pose(self, t):
         if self.started is None:
@@ -59,6 +61,8 @@ class CampusMap:
     delivery: tuple                       # (x, y)
     door: tuple
     bumps: list                           # [(x0,y0,x1,y1,height)]
+    slow_zones: list = field(default_factory=list)   # ramps: (xmin, xmax, ymin, ymax, v_max)
+    curbs: list = field(default_factory=list)        # plain curb faces beside the far ramp: (x_face, ymin, ymax, height)
     agents: list = field(default_factory=list)
 
 
@@ -108,9 +112,13 @@ def build_world(robot_xml, seed=3):
         G.append(_box(nm, ((x0 + x1) / 2, (y0 + y1) / 2, 0.0 - gt), ((x1 - x0) / 2, (y1 - y0) / 2, gt), mat="grass"))
     grass(-60, 38.5, -60, 80, "grass_w")
     grass(48.5, 110, -60, 80, "grass_e")
-    # curb strips left/right of the curb ramps
+    # curb strips left/right of the curb ramps: grass, with a paved apron
+    # beside each 1.4 m curb ramp (plain 12.4 cm curb face toward the road)
     grass(38.5, 40.0, -60, 22.8, "curb_w_s"); grass(38.5, 40.0, 25.2, 80, "curb_w_n")
-    grass(47.0, 48.5, -60, 22.8, "curb_e_s"); grass(47.0, 48.5, 25.2, 80, "curb_e_n")
+    grass(47.0, 48.5, -60, 21.0, "curb_e_s"); grass(47.0, 48.5, 26.4, 80, "curb_e_n")
+    for nm, x0, x1 in (("apron_e", 47.0, 48.5),):
+        for k, (y0, y1) in enumerate(((21.0, RAMP_Y0), (RAMP_Y1, 26.4))):
+            G.append(_box(f"{nm}{k}", ((x0 + x1) / 2, (y0 + y1) / 2, SW_Z - 0.2), ((x1 - x0) / 2, (y1 - y0) / 2, 0.2), mat="concrete"))
 
     # ---------------- sidewalks
     sidewalks = []
@@ -149,7 +157,14 @@ def build_world(robot_xml, seed=3):
         n = np.array([sg * np.sin(ang), 0, np.cos(ang)])
         c = top_c - n * 0.10
         Lr = (x1 - x0) / np.cos(ang)
-        G.append(_box(nm, c, (Lr / 2 + 0.01, SW_W / 2, 0.10), mat="concrete", euler=(0, sg * ang, 0)))
+        ry0, ry1 = (RAMP_Y0, RAMP_Y1) if nm == "cramp_e" else (22.8, 25.2)   # west ramp: full sidewalk width
+        c[1] = 0.5 * (ry0 + ry1)
+        G.append(_box(nm, c, (Lr / 2 + 0.01, (ry1 - ry0) / 2, 0.10), mat="concrete", euler=(0, sg * ang, 0)))
+    # an e-scooter someone knocked over, lying across the east curb ramp
+    G.append(_box("fallen_scooter_deck", (47.85, 24.0, -0.02), (0.09, 0.56, 0.045), rgba=(0.1, 0.1, 0.1, 1), euler=(0.12, 0.0, 0.25)))
+    G.append(_box("fallen_scooter_stem", (47.55, 23.45, -0.02), (0.03, 0.40, 0.03), rgba=(0.8, 0.15, 0.1, 1), euler=(0.0, 0.0, 1.35)))
+    # a hedge right beside the main sidewalk: a classic blind spot
+    G.append(_box("hedge", (22.0, -1.98, 0.6), (1.2, 0.32, 0.6), mat="leaf"))
     # crosswalk stripes + lane line
     for i in range(6):
         y = 24 - 1.25 + i * 0.5
@@ -172,7 +187,7 @@ def build_world(robot_xml, seed=3):
     G.append(_box("scooter_deck", (29.55, 3.3, SW_Z + 0.06), (0.10, 0.55, 0.06), rgba=(0.1, 0.1, 0.1, 1)))
     G.append(_box("scooter_stem", (29.55, 2.75, SW_Z + 0.12), (0.03, 0.03, 0.12), rgba=(0.8, 0.15, 0.1, 1)))
     # benches, lamps, trees, bike rack (off the walking surface)
-    for i, (x, y, yaw) in enumerate([(8, 1.75, 0), (22, -1.75, 0), (27.2, 12.6, np.pi / 2), (54, 25.7, 0)]):
+    for i, (x, y, yaw) in enumerate([(8, 1.75, 0), (17.5, -1.75, 0), (27.2, 12.6, np.pi / 2), (54, 25.7, 0)]):
         z = PLAZA_Z if 9.6 < y < 15.6 and 25 < x < 35 else 0.0
         G.append(_box(f"bench_{i}", (x, y, z + 0.45), (0.9, 0.22, 0.03), mat="wood", euler=(0, 0, yaw)))
         G.append(_box(f"benchb_{i}", (x, y, z + 0.22), (0.8, 0.18, 0.22), mat="metal_dark", euler=(0, 0, yaw)))
@@ -220,21 +235,36 @@ def build_world(robot_xml, seed=3):
         Agent("car_s", "car", [(41.8, 60), (41.8, -20)], 6.5, trigger=lambda p, t: p[1] > 22 and p[0] > 37.2, color=(0.12, 0.25, 0.6), z=ROAD_Z),
         Agent("ped_cust", "ped", [(60.7, 26.15), (60.35, 24.95)], 0.9, trigger=None, color=(0.95, 0.45, 0.6)),
         Agent("ped_bg", "ped", [(-10, -5), (10, -5)], 1.3, trigger=lambda p, t: True, color=(0.4, 0.4, 0.4), loop=True),
+        # a kid darts out from behind the hedge
+        Agent("child", "ped", [(22.9, -2.75), (22.9, 3.2)], 2.3, trigger=lambda p, t: 19.8 < p[0] < 26 and abs(p[1]) < 2, color=(0.95, 0.75, 0.15), scale=0.62),
+        # a bike comes up fast from behind, then turns off up the branch path
+        Agent("bike_a", "bike", [(-7.0, 0.78), (14.2, 0.78), (15.0, 1.6), (15.0, 24.0)], 5.2, trigger=lambda p, t: p[0] > 2.5, color=(0.15, 0.55, 0.85)),
     ]
     for ag in agents:
         c = " ".join(f"{x:.2f}" for x in ag.color)
+        k = ag.scale
         if ag.kind == "ped":
             B.append(f"""
     <body name="{ag.name}" mocap="true" pos="{ag.path[0][0]} {ag.path[0][1]} 0">
-      <geom type="capsule" fromto="0 0 0.95 0 0 1.45" size="0.2" rgba="{c} 1"/>
-      <geom type="sphere" pos="0 0 1.66" size="0.11" material="skin"/>
-      <geom type="sphere" pos="0.01 0 1.71" size="0.105" rgba="0.2 0.15 0.1 1" contype="0" conaffinity="0"/>
+      <geom type="capsule" fromto="0 0 {0.95*k:.3f} 0 0 {1.45*k:.3f}" size="{0.2*k:.3f}" rgba="{c} 1"/>
+      <geom type="sphere" pos="0 0 {1.66*k:.3f}" size="{0.11*max(k,0.8):.3f}" material="skin"/>
+      <geom type="sphere" pos="0.01 0 {1.71*k:.3f}" size="{0.105*max(k,0.8):.3f}" rgba="0.2 0.15 0.1 1" contype="0" conaffinity="0"/>
     </body>
     <body name="{ag.name}_l" mocap="true" pos="{ag.path[0][0]} {ag.path[0][1]} 0">
-      <geom type="capsule" fromto="0 0.09 0.05 0 0.09 0.9" size="0.075" rgba="0.2 0.22 0.3 1"/>
+      <geom type="capsule" fromto="0 {0.09*k:.3f} 0.05 0 {0.09*k:.3f} {0.9*k:.3f}" size="{0.075*k:.3f}" rgba="0.2 0.22 0.3 1"/>
     </body>
     <body name="{ag.name}_r" mocap="true" pos="{ag.path[0][0]} {ag.path[0][1]} 0">
-      <geom type="capsule" fromto="0 -0.09 0.05 0 -0.09 0.9" size="0.075" rgba="0.2 0.22 0.3 1"/>
+      <geom type="capsule" fromto="0 {-0.09*k:.3f} 0.05 0 {-0.09*k:.3f} {0.9*k:.3f}" size="{0.075*k:.3f}" rgba="0.2 0.22 0.3 1"/>
+    </body>""")
+        elif ag.kind == "bike":
+            B.append(f"""
+    <body name="{ag.name}" mocap="true" pos="{ag.path[0][0]} {ag.path[0][1]} 0">
+      <geom type="cylinder" pos="0.52 0 0.34" size="0.34 0.02" zaxis="0 1 0" rgba="0.05 0.05 0.05 1"/>
+      <geom type="cylinder" pos="-0.52 0 0.34" size="0.34 0.02" zaxis="0 1 0" rgba="0.05 0.05 0.05 1"/>
+      <geom type="capsule" fromto="-0.5 0 0.36 0.45 0 0.62" size="0.025" rgba="{c} 1"/>
+      <geom type="capsule" fromto="-0.15 0 0.62 -0.15 0 1.25" size="0.17" rgba="0.25 0.25 0.3 1"/>
+      <geom type="sphere" pos="-0.05 0 1.45" size="0.12" material="skin"/>
+      <geom type="sphere" pos="-0.04 0 1.5" size="0.125" rgba="{c} 1" contype="0" conaffinity="0"/>
     </body>""")
         else:
             B.append(f"""
@@ -253,7 +283,9 @@ def build_world(robot_xml, seed=3):
              (38.3, 24.0, "xwalk_in"), (48.7, 24.0, "xwalk_out"), (60.0, 24.0, "deliver")]
     cmap = CampusMap(route=route, sidewalks=sidewalks, road_poly=(40.0, 47.0, -60, 80),
                      crosswalk=(38.3, 48.7, 24.0), delivery=(60.0, 24.0), door=(60.0, 26.4),
-                     bumps=bumps, agents=agents)
+                     bumps=bumps, agents=agents,
+                     slow_zones=[(28.6, 31.4, 5.6, 10.2, 1.0), (28.6, 31.4, 15.0, 19.6, 1.0), (37.5, 40.2, 22.6, 25.4, 0.9), (46.8, 49.5, 22.6, 25.4, 0.9)],
+                     curbs=[(47.0, 21.0, 23.3, SW_Z - ROAD_Z), (47.0, 24.7, 26.4, SW_Z - ROAD_Z)])
 
     xml = f"""
 <mujoco model="orb_campus">

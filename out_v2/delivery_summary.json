@@ -1,0 +1,189 @@
+{
+ "sim_time_s": 157.2,
+ "distance_m": 85.2,
+ "delivered": true,
+ "events": [
+  [
+   72.0,
+   "DRIVE",
+   "XWALK_WAIT"
+  ],
+  [
+   78.6,
+   "XWALK_WAIT",
+   "XWALK_CROSS"
+  ],
+  [
+   80.3,
+   "ramp blocked",
+   "use curb at offset -1.50 m (12 cm)"
+  ],
+  [
+   80.3,
+   "XWALK_CROSS",
+   "CURB_ALIGN"
+  ],
+  [
+   98.4,
+   "CURB_ALIGN",
+   "CURB"
+  ],
+  [
+   114.4,
+   "CURB",
+   "CURB_EXIT"
+  ],
+  [
+   126.4,
+   "CURB_EXIT",
+   "DRIVE"
+  ],
+  [
+   130.6,
+   "DRIVE",
+   "APPROACH"
+  ],
+  [
+   133.3,
+   "APPROACH",
+   "ALIGN"
+  ],
+  [
+   138.9,
+   "ALIGN",
+   "PARK"
+  ],
+  [
+   141.9,
+   "PARK",
+   "OPEN"
+  ],
+  [
+   144.4,
+   "OPEN",
+   "HANDOFF"
+  ],
+  [
+   149.4,
+   "HANDOFF",
+   "CLOSE"
+  ],
+  [
+   153.2,
+   "CLOSE",
+   "DONE"
+  ]
+ ],
+ "mean_speed_moving_mps": 0.89,
+ "max_speed_mps": 2.06,
+ "time_at_cruise_pct": 4.1,
+ "speed_cap_reasons_pct": {
+  "people nearby": 27.1,
+  "corner": 18.9,
+  "cruise": 11.3,
+  "ramp ahead": 8.2,
+  "strong wind": 7.7,
+  "yielding": 7.2,
+  "crosswalk ahead": 4.7,
+  "turning": 3.0,
+  "arriving": 2.5,
+  "blind spot": 2.4,
+  "EMERGENCY STOP": 2.2,
+  "keeping right for pedestrian": 1.6,
+  "slope": 1.5,
+  "steering around": 1.1,
+  "pedestrian crossing ahead": 0.3,
+  "path blocked": 0.1
+ },
+ "max_pod_tilt_deg": 10.98,
+ "p99_pod_tilt_deg": 5.3,
+ "max_food_g": 0.91,
+ "p99_food_g": 0.27,
+ "max_liquid_tilt_deg": 30.9,
+ "max_lean_deg": 15.01,
+ "loc_err_mean_m": 0.4,
+ "loc_err_max_m": 0.9,
+ "vision_fixes": 424,
+ "max_wind_mps": 13.2,
+ "robot_wind_est_max": 9.9,
+ "emergency_stops": 1,
+ "safety_mcu_events": [],
+ "curb_climbs": [
+  {
+   "result": "done",
+   "h": 0.13278954871224297,
+   "up": true,
+   "t": 15.9,
+   "events": [
+    [
+     101.2,
+     "approach",
+     "lift"
+    ],
+    [
+     103.02,
+     "lift",
+     "cart"
+    ],
+    [
+     106.62,
+     "edge by contact",
+     70.765
+    ],
+    [
+     106.62,
+     "cart",
+     "handoff"
+    ],
+    [
+     107.82,
+     "handoff",
+     "climb"
+    ],
+    [
+     109.31,
+     "crest",
+     {
+      "x": 0.031,
+      "Zm": 0.008,
+      "wheel_v": -0.47
+     }
+    ],
+    [
+     109.31,
+     "climb",
+     "mount"
+    ],
+    [
+     114.34,
+     "mount",
+     "done"
+    ]
+   ]
+  }
+ ],
+ "energy_Wh": 1.87,
+ "avg_power_W": 42.7,
+ "energy_split_Wh": {
+  "drive": 0.214,
+  "steer": 0.578,
+  "level": 0.006,
+  "legs": 0.042,
+  "hotel": 1.026
+ },
+ "runtime_est_h_at_this_duty": 13.7,
+ "robot_contacts_with_people_or_cars": 0,
+ "min_clearance_m": {
+  "ped_a": 0.21,
+  "ped_b": 0.32,
+  "ped_g1": 0.3,
+  "ped_g2": 0.55,
+  "ped_c": 1.84,
+  "car_n": 5.56,
+  "car_s": 2.16,
+  "ped_cust": 0.41,
+  "child": 0.87,
+  "bike_a": 0.53
+ },
+ "peak_drive_torque_Nm": 32.0
+}

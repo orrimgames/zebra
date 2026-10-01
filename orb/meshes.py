@@ -154,6 +154,30 @@ def pod_mesh(r, top, half_w, ins, n=40):
     return mb
 
 
+def bowl_mesh(r, top, ins, n_lon=48, n_lat=18):
+    """Insulated bowl: sphere of radius r cut flat at z=top, wall thickness ins."""
+    mb = MeshBuilder()
+    def shell(rr):
+        th_top = np.arccos(np.clip(top / rr, -1, 1))      # polar angle from +z of the rim
+        ths = np.linspace(th_top, np.pi, n_lat)
+        phs = np.linspace(0, 2 * np.pi, n_lon + 1)[:-1]
+        idx = [[mb.add_v([rr * np.sin(t) * np.cos(p), rr * np.sin(t) * np.sin(p), rr * np.cos(t)]) for p in phs] for t in ths[:-1]]
+        pole = mb.add_v([0, 0, -rr])
+        for i in range(len(idx) - 1):
+            for k in range(n_lon):
+                k2 = (k + 1) % n_lon
+                mb.quad(idx[i][k], idx[i + 1][k], idx[i + 1][k2], idx[i][k2])
+        for k in range(n_lon):
+            mb.tri(idx[-1][k], pole, idx[-1][(k + 1) % n_lon])
+        return idx[0]
+    o = shell(r)
+    i_ = shell(r - ins)
+    for k in range(n_lon):
+        k2 = (k + 1) % n_lon
+        mb.quad(o[k], o[k2], i_[k2], i_[k])
+    return mb
+
+
 def seam_ring_mesh(R, lat0, lat1, side, n=128):
     """Thin glowing strip on the sphere between two latitudes (the cap seam)."""
     mb = MeshBuilder()

@@ -21,7 +21,7 @@ WALK, GRASS, ASPHALT, PAINT, UNKNOWN = 1, 2, 3, 4, 0
 
 
 class BEV:
-    def __init__(self, x0=-0.6, x1=6.0, y0=-3.0, y1=3.0, res=0.1):
+    def __init__(self, x0=-0.6, x1=9.0, y0=-3.0, y1=3.0, res=0.1):
         self.x0, self.x1, self.y0, self.y1, self.res = x0, x1, y0, y1, res
         self.nx = int(round((x1 - x0) / res)); self.ny = int(round((y1 - y0) / res))
         self.clear()
@@ -102,7 +102,7 @@ class Perception:
             z = dep.astype(np.float64)
             noise = self.rng.normal(0, 1, z.shape) * (0.004 * z ** 2 + 0.005)
             zn = z + noise
-            valid = (z > 0.15) & (z < 7.5) & (self.rng.random(z.shape) > 0.03)
+            valid = (z > 0.15) & (z < 10.0) & (self.rng.random(z.shape) > 0.03)
             cid = self.cam_ids[cam]
             Rc = d.cam_xmat[cid].reshape(3, 3); pc = d.cam_xpos[cid]
             P = (self.ray * zn[..., None]) @ Rc.T + pc          # world points

@@ -1,27 +1,31 @@
-part,category,qty,unit_usd,total_usd,notes
-Translucent 650 mm hemispheres (cut into rolling band + 2 side caps),shell,2,60,120,"Prototype: off-the-shelf PE/PC dome pair. Production: rotomould (one-off tooling, amortised)"
-TPU tread band overlay (cast/printed),shell,1,35,35,Grip + some shock absorption on the contact band
-Internal ring-gear segments + roller track,shell,1,40,40,Printed nylon/POM bonded inside the band edges
-V-groove rollers on 608 bearings,shell,24,1.25,30,Band rides on the stationary caps (no through-axle)
-Hatch hinge + latch servo + gasket,shell,1,30,30,Flush load-bearing door in the band
-Aluminium frame + stub axles + fasteners,structure,1,90,90,Laser-cut plate + extrusion
-BLDC drive motors with pinions (63xx class),drive,2,55,110,Drive pendulum -> ring gear (~20:1)
-FOC motor drivers,drive,2,60,120,
-Battery-swing steering actuator (12 Nm geared BLDC + encoder),drive,1,70,70,Must slew >=5 rad/s (sim requirement)
-Pod leveling motor (small geared DC + encoder),drive,1,25,25,<0.5 Nm needed in sim
-Park legs (4) + linkage + servo,park,1,60,60,Out of the stationary caps
-Spring-applied power-off brake,park,1,25,25,
-Battery 36 V 10S3P 21700 (432 Wh) + BMS + pack build,power,1,160,160,~12.8 h continuous driving
-Charging contacts + DC-DC converters,power,1,35,35,
-Compute: Jetson Orin Nano class module/kit,compute,1,249,249,Perception + planning; Pi 5 + NPU is a cheaper alternative
-Global-shutter fisheye cameras,sensing,4,35,140,2 per cap (front + rear)
-GNSS module,sensing,1,25,25,Metre-level is enough (vision corrects to ~0.2 m)
-IMU,sensing,1,15,15,
-Near-field ToF sensors,sensing,3,10,30,Cameras can't see the first ~0.45 m
-LTE modem + antenna,comms,1,45,45,
-Insulated EPP food pod + removable PP liner + gasket,food,1,45,45,~19 L
-Electronic pod lock + temperature sensor,food,1,20,20,Unlocks for the recipient's code only
-Eye LED panel + glow LED strips,looks,1,35,35,Eyes render through the translucent band
-Speaker + mic,looks,1,15,15,
-Flush E-stop + kill relay,safety,1,20,20,
-Wiring / connectors / prints / misc,misc,1,60,60,
+part,category,qty,unit_usd,total_usd,price_basis,v1_comparison,notes
+Translucent ~650 mm hemispheres (cut into rolling band + 2 side caps),shell,2,60,120,estimate (quote needed),same,Prototype: blown acrylic/PC dome pair (Modulor / plastic-domes-spheres quote-only). Production: rotomould
+TPU tread band overlay,shell,1,35,35,estimate,same,Grip + some shock absorption on the contact band
+Internal ring gears + roller tracks,shell,1,40,40,estimate,same,Printed nylon/POM bonded inside the band edges
+V-groove rollers on 608 bearings,shell,24,1.25,30,estimate,same,Band rides on the stationary caps (no through-axle)
+Hatch hinge + latch servo + gasket + pinch sensing,shell,1,32,32,estimate,+2,Flush load-bearing door; closing force limited + reverses on contact
+Band counterweight opposite the hatch (steel strip),shell,1,5,5,estimate,NEW,Balances the lid: removed a 0.7 Hz speed/pendulum wobble found in sim
+Aluminium frame + stub axles + fasteners,structure,1,90,90,estimate,same,Laser-cut plate + extrusion
+Drive BLDC 5065-class sensored outrunner,drive,2,64,128,verified (Funduino EUR54.77),~same,Drive pendulum -> ring gear (~20:1); motors now sit low at the ring gear
+FOC driver MKS ODESC v4.2,drive,2,35,70,verified (SequreMall $34.99),-50,Replaces $60 drivers (v1); 70 A peak
+Tray steering actuator GIM8108-8 (22 Nm) + ODESC driver,drive,1,120,120,verified ($85 + $35),+50,Swings the 5.8 kg LFP tray at >=5 rad/s
+Cap leveling self-locking worm gearmotor,drive,1,29,29,verified (RobotShop $28.90),+4,Self-locking = holds caps rigid to the pendulum during curb climbs
+Telescoping series-elastic legs (lead-screw stepper + 3-stage tube + spring),park/curb,4,45,180,estimate (generic T8 steppers ~$25-35 unverified),+120,0.31 m stroke; spring deflection = force sensor
+Leg wheel gearmotors N20 1:150 with encoder + 50 mm PU wheels,park/curb,4,10,40,verified ($6.99 motor),NEW,Cart mode for curbs; worm-like holding when parked
+Spring-applied power-off brake (2 Nm),park,1,33,33,verified (StepperOnline SWB-03),+8,Fail-safe: no power = band locked
+Battery 12S3P LiFePO4 32700 6 Ah (36 cells),power,36,4,144,verified (~$4/cell at 40 pcs),NEW,690 Wh; heavier than NMC on purpose (it is the steering ballast); no thermal runaway; 3000+ cycles
+12S 40 A LFP smart BMS with CAN + pack build/enclosure + cell heater,power,1,80,80,partly verified (Daly $49),NEW,Heater lets it charge below 0 C (LFP limitation)
+Charging contacts + DC-DC converters,power,1,35,35,estimate,same,
+Compute: Raspberry Pi 5 8GB + AI HAT+ 26 TOPS (Hailo-8),compute,1,257,257,verified ($125 + $132),+8 vs v1 $249 (Jetson is now $399),Perception + planning; Jetson Orin Nano Super is the fallback at $399
+Independent safety MCU (RP2040/STM32 class) + kill relay + E-stop,safety,1,30,30,estimate,+10,Own ToF + IMU; cuts drive + commands stop even if the main computer hangs
+Global-shutter wide cameras (OV9281 150 deg) + IR illuminators,sensing,4,38,152,verified ($35.99 camera),+12,2 per cap (front stereo + rear)
+24 GHz traffic radar HLK-LD2451 (100 m vehicle range),sensing,2,15,30,verified (~$10; $15 budgeted),NEW,Sees cars and their speed at crossings in rain/dark
+Near-field ToF VL53L1X (4 forward/oblique + 2 down-looking cliff),sensing,6,15,90,verified ($22.95 Pololu carrier; bare modules less),+60,4 feed the safety MCU; 2 aimed 40 deg down find drop-off edges for curb descent to ~1 cm
+GNSS u-blox NEO-M9N,sensing,1,60,60,verified (SparkFun sale),+35,Metre-level; vision corrects to ~0.3 m. RTK (ZED-F9P ~$220) not needed
+IMU (BMI088 class),sensing,2,15,30,estimate,+15,One for the main computer + one for the safety MCU
+LTE Cat-1/Cat-4 modem + antenna,comms,1,70,70,partly verified (SIM7600 HAT $112; bare module less),+25,Remote assistance + fleet dispatch
+Insulated EPP food bowl + removable PP liner + elastomer mounts,food,1,50,50,estimate,+5,~18 L; 7 Hz vertical isolation
+Electronic pod lock + temperature sensor,food,1,20,20,estimate,same,Unlocks for the recipient's code only
+Eye LED panel + glow LED strips,looks,1,35,35,estimate,same,Eyes render through the translucent band
+Speaker + mic,looks,1,15,15,estimate,same,
+Wiring / connectors / prints / misc,misc,1,70,70,estimate,+10,
